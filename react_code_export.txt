@@ -1,0 +1,1107 @@
+// File: frontend/src\App.js
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Dashboard from "./pages/dashboard";
+import Events from "./pages/events";
+import Tasks from "./pages/tasks";
+import Profile from "./pages/profile";
+import Home from "./home";
+// import Create from "./buttons/createevent"
+import Login from "./authentication/login"
+import Signup from "./authentication/signup";
+import EditEvent from './buttons/editevent';
+import CreateEvent from './buttons/createevent';
+
+
+
+function App() {
+  return (
+    <div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/createevent" element={<CreateEvent />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/editevent/:eventid" element={<EditEvent/>} />
+          {/* <Route path="/logout" element={<Logout />} /> */}
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+}
+
+export default App;
+
+
+// File: frontend/src\home.jsx
+import React from 'react';
+import { Link } from "react-router-dom";
+
+
+function Home() {
+    return (
+        <div className="bg-gray-100">
+            <div className="container mx-auto p-20">
+                <div className="bg-white p-8 rounded shadow-md mx-52">
+                    <h1 className="text-2xl font-bold mb-6">Eventure</h1>
+                    <div className="space-y-4">
+                        <div>
+                            <h2 className="text-lg font-semibold">Register Student Profile</h2>
+                            <p>Register as a student to access the student portal of Eventure</p>
+                            <Link to="/signup"><button className="mt-2 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700">Register your student profile</button>
+                            </Link>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-semibold">Login to Student Portal</h2>
+                            <p>Please click the below link to login to the student portal</p>
+                            <Link to="/login"><button className="mt-2 py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700">Login to Student Portal</button>
+                            </Link>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-semibold">Login to Admin Portal</h2>
+                            <p>Please click the below link to login to the admin portal</p>
+                            <button className="mt-2 py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700">Login to Admin Portal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Home;
+
+
+// File: frontend/src\index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from "./App"
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <div>
+    <App />
+  </div>
+);
+
+// File: frontend/src\authentication\login.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
+function Login() {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  async function check(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    try {
+      const response = await axios.post('http://localhost:5000/login', { name, password });
+      if (response.data.success) {
+        // Store the name in local storage
+        localStorage.setItem('name', response.data.name);
+        
+        // Navigate to the dashboard
+        navigate('/dashboard');
+      } else {
+        setError(response.data.message || 'Invalid username or password');
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-20">
+      <div className="bg-white p-8 rounded shadow-md mx-52">
+        <h1 className="text-2xl font-bold mb-6">Login to Eventure</h1>
+
+        <form onSubmit={check}>
+          <div className="mb-4">
+            <label htmlFor="name" className="block mb-2">Username</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-2">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="mb-4">
+            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Login</button>
+          </div>
+          {error && <div className="text-red-600">{error}</div>}
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
+
+
+// File: frontend/src\authentication\signup.jsx
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+function Signup() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    
+    try {
+      const response = await axios.post('http://localhost:5000/signup', { username, password });
+      if (response.data.message === "User created successfully") {
+        navigate('/login');
+      } else {
+        setError(response.data.message || 'Signup failed.');
+      }
+    } catch (error) {
+      console.error('There was an error!', error);
+      setError('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="text-center py-4">
+        <h1 className="text-2xl">Signup</h1>
+      </div>
+      <div className="bg-white p-4 mt-4 shadow-sm">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="username" className="block mb-2">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-2">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="confirmPassword" className="block mb-2">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Signup</button>
+          </div>
+          {error && <div className="text-red-600">{error}</div>}
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default Signup;
+
+
+// File: frontend/src\buttons\createevent.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Header from '../common/header';
+
+function CreateEvent() {
+  const [event, setEvent] = useState({
+    title: '',
+    description: '',
+    date: '',
+    location: '',
+    userid: localStorage.getItem('userid'), // Assuming the user ID is stored in localStorage after login
+    task_ids: '',
+    participant_ids: '',
+  });
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEvent((prevEvent) => ({ ...prevEvent, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Converting task_ids and participant_ids to arrays of numbers
+      const taskIdsArray = event.task_ids ? event.task_ids.split(',').map(Number) : [];
+      const participantIdsArray = event.participant_ids ? event.participant_ids.split(',').map(Number) : [];
+
+      const eventData = {
+        ...event,
+        task_ids: taskIdsArray,
+        participant_ids: participantIdsArray,
+      };
+
+      const response = await axios.post('http://localhost:5000/events', eventData);
+      if (response.data.success) {
+        navigate('/events');
+      } else {
+        console.error('Failed to create event');
+      }
+    } catch (error) {
+      console.error('Error creating event:', error);
+    }
+  };
+
+  return (
+    <div>
+      <Header />
+      <div className="container mx-auto p-4">
+        <div className="text-center py-4">
+          <h1 className="text-2xl">Create New Event</h1>
+        </div>
+        <div className="bg-white p-4 mt-4 shadow-sm">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="title" className="block mb-2">Event Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={event.title}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="description" className="block mb-2">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={event.description}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              ></textarea>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="date" className="block mb-2">Date</label>
+              <input
+                type="date"
+                id="date"
+                name="date"
+                value={event.date}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="location" className="block mb-2">Location</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value={event.location}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="task_ids" className="block mb-2">Task IDs (comma separated)</label>
+              <input
+                type="text"
+                id="task_ids"
+                name="task_ids"
+                value={event.task_ids}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="participant_ids" className="block mb-2">Participant IDs (comma separated)</label>
+              <input
+                type="text"
+                id="participant_ids"
+                name="participant_ids"
+                value={event.participant_ids}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Create Event</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CreateEvent;
+
+
+// File: frontend/src\buttons\editevent.jsx
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+
+function EditEvent() {
+  const { eventid } = useParams();
+  const [event, setEvent] = useState({
+    title: '',
+    description: '',
+    date: '',
+    location: ''
+  });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/events/${eventid}`);
+        if (response.data.success) {
+          setEvent(response.data.event);
+        } else {
+          console.error('Failed to fetch event');
+        }
+      } catch (error) {
+        console.error('Error fetching event:', error);
+      }
+    };
+
+    fetchEvent();
+  }, [eventid]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEvent((prevEvent) => ({ ...prevEvent, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(`http://localhost:5000/events/${eventid}`, event);
+      if (response.data.success) {
+        navigate('/events');
+      } else {
+        console.error('Failed to update event');
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl mb-4">Edit Event</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block mb-2">Event Name</label>
+          <input
+            type="text"
+            name="title"
+            value={event.title}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2">Description</label>
+          <textarea
+            name="description"
+            value={event.description}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2">Date</label>
+          <input
+            type="date"
+            name="date"
+            value={event.date}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2">Location</label>
+          <input
+            type="text"
+            name="location"
+            value={event.location}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Update Event</button>
+      </form>
+    </div>
+  );
+}
+
+export default EditEvent;
+
+
+// File: frontend/src\common\header.jsx
+import { Link } from "react-router-dom";
+function Header() {
+    return (
+        <div>
+            <nav className="bg-gray-800 text-white p-4 text-center">
+                <Link to="/dashboard" className="mx-2">Home</Link>
+                <Link to="/events" className="mx-2">Events</Link>
+                <Link to="/tasks" className="mx-2">Tasks</Link>
+                <Link to="/profile" className="mx-2">Profile</Link>
+                <Link to="" className="mx-2">Logout</Link>
+            </nav>
+        </div>
+    )
+}
+
+export default Header
+
+// File: frontend/src\pages\dashboard.jsx
+import { useEffect, useState } from "react";
+import Header from "../common/header";
+import { Link } from "react-router-dom";
+
+function Dashboard() {
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+        // Retrieve the name from localStorage
+        const storedName = localStorage.getItem('name');
+        
+        if (!storedName) {
+          console.error('No name found in localStorage');
+          return;
+        }
+        
+        const response = await fetch(`http://localhost:5000/userdata?name=${storedName}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setName(data.user.name);
+        } else {
+          console.error('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchName();
+  }, []);
+
+  return (
+    <div>
+      <Header />
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center py-4">
+          <h1 className="text-2xl">Welcome, {name}</h1>
+          <Link to="/createevent">
+            <button className="px-4 py-2 bg-blue-500 text-white rounded">
+              Create New Event
+            </button>
+          </Link>
+        </div>
+        <div className="bg-white p-4 mt-4 shadow-sm">
+          <h2 className="text-xl mb-4">Upcoming Events</h2>
+          <p>Event 1: Conference on Web Development - Date: 2024-02-15</p>
+          <p>Event 2: Tech Networking Meetup - Date: 2024-03-05</p>
+        </div>
+        <div className="bg-white p-4 mt-4 shadow-sm">
+          <h2 className="text-xl mb-4">Your Tasks</h2>
+          <div className="bg-gray-200 p-2 mb-2">Task 1: Prepare presentation for the conference</div>
+          <div className="bg-gray-200 p-2 mb-2">Task 2: Coordinate with tech meetup speakers</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;
+
+
+// File: frontend/src\pages\events.jsx
+import React, { useEffect, useState } from 'react';
+import Header from '../common/header';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+function Events() {
+  const [events, setEvents] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/events');
+        if (response.data.success) {
+          setEvents(response.data.events);
+        } else {
+          console.error('Failed to fetch events');
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const handleEdit = (eventid) => {
+    navigate(`/editevent/${eventid}`);
+  };
+
+  const handleDelete = async (eventid) => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/events/${eventid}`);
+      if (response.data.success) {
+        setEvents(events.filter(event => event.eventid !== eventid));
+      } else {
+        console.error('Failed to delete event');
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  };
+
+  return (
+    <div>
+      <Header />
+      <div className="container mx-auto p-4">
+        <div className="text-center py-4">
+          <h1 className="text-2xl">Event Details</h1>
+        </div>
+        {events.map(event => (
+          <div key={event.eventid} className="bg-white p-4 mt-4 shadow-sm">
+            <div className="mb-4">
+              <label className="font-bold">Event Name:</label>
+              <div className="ml-1">{event.title}</div>
+            </div>
+            <div className="mb-4">
+              <label className="font-bold">Event Date:</label>
+              <div className="ml-1">{event.date}</div>
+            </div>
+            <div className="mb-4">
+              <label className="font-bold">Location:</label>
+              <div className="ml-1">{event.location}</div>
+            </div>
+            <div className="mb-4">
+              <label className="font-bold">Description:</label>
+              <div className="ml-1">{event.description}</div>
+            </div>
+            <div className="flex space-x-4">
+              <button onClick={() => handleEdit(event.eventid)} className="px-4 py-2 bg-blue-500 text-white rounded">Edit Event</button>
+              <button onClick={() => handleDelete(event.eventid)} className="px-4 py-2 bg-red-500 text-white rounded">Delete Event</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Events;
+
+
+// File: frontend/src\pages\profile.jsx
+import Header from "../common/header"
+
+
+function Profile() {
+  return (
+    <div>
+      <Header />
+      <div className="container mx-auto p-4">
+        <div className="text-center py-4">
+          <h1 className="text-2xl">Profile Management</h1>
+        </div>
+        
+        <div className="bg-white p-4 mt-4 shadow-sm">
+          <h2 className="text-xl mb-4">Change Password</h2>
+          <form>
+            <div className="mb-4">
+              <label htmlFor="currentPassword" className="block mb-2">Current Password</label>
+              <input type="password" id="currentPassword" name="currentPassword" className="w-full p-2 border border-gray-300 rounded" />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="newPassword" className="block mb-2">New Password</label>
+              <input type="password" id="newPassword" name="newPassword" className="w-full p-2 border border-gray-300 rounded" />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="confirmPassword" className="block mb-2">Confirm New Password</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" className="w-full p-2 border border-gray-300 rounded" />
+            </div>
+            <div className="mb-4">
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Change Password</button>
+            </div>
+          </form>
+        </div>
+        <div className="bg-white p-4 mt-4 shadow-sm">
+          <h2 className="text-xl mb-4">Past Events and Activities</h2>
+          <ul className="list-disc pl-5">
+            <li>Event 1: Tech Conference - Date: 2023-06-15</li>
+            <li>Event 2: Annual Meetup - Date: 2023-09-10</li>
+            {/* Additional past events can be listed here */}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  )
+}
+
+export default Profile
+
+// File: frontend/src\pages\tasks.jsx
+import Header from "../common/header"
+function Tasks() {
+  return (
+    <div>
+      <Header />
+      <div className="container mx-auto p-4">
+        <div className="text-center py-4">
+          <h1 className="text-2xl">Create New Task</h1>
+        </div>
+        <div className="bg-white p-4 mt-4 shadow-sm">
+          <form>
+            <div className="mb-4">
+              <label htmlFor="relatedEvent" className="block mb-2">Related Event</label>
+              <select id="relatedEvent" name="relatedEvent" className="w-full p-2 border border-gray-300 rounded">
+                <option value="event1">Event 1: Tech Conference</option>
+                <option value="event2">Event 2: Annual Meetup</option>
+                {/* Additional event options can be added here */}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="taskTitle" className="block mb-2">Task Title</label>
+              <input type="text" id="taskTitle" name="taskTitle" className="w-full p-2 border border-gray-300 rounded" />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="taskDescription" className="block mb-2">Task Description</label>
+              <textarea id="taskDescription" name="taskDescription" className="w-full p-2 border border-gray-300 rounded"></textarea>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="taskDeadline" className="block mb-2">Deadline</label>
+              <input type="date" id="taskDeadline" name="taskDeadline" className="w-full p-2 border border-gray-300 rounded" />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="taskAssignee" className="block mb-2">Assignee</label>
+              <select id="taskAssignee" name="taskAssignee" className="w-full p-2 border border-gray-300 rounded">
+                <option value="user1">User 1</option>
+                <option value="user2">User 2</option>
+                <option value="user3">User 3</option>
+                {/* Additional user options can be added here */}
+              </select>
+            </div>
+            <div className="mb-4">
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Create Task</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Tasks
+
+// File: backend\index.js
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./config/db");
+const User = require("./models/user");
+const Event = require("./models/event");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Connect to MongoDB
+connectDB();
+
+// Signup Route
+app.post("/signup", async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const existingUser = await User.findOne({ name });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const newUser = new User({ userid: Date.now(), name, password });
+    await newUser.save();
+    res.status(201).json({ message: "User created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error creating user", error });
+  }
+});
+
+// Login Route
+app.post("/login", async (req, res) => {
+  try {
+    const { name, password } = req.body;
+
+    // Find the user in the database
+    const foundUser = await User.findOne({ name });
+
+    if (foundUser) {
+      // Compare the password in plain text
+      if (foundUser.password === password) {
+        // Successful login
+        res.json({ success: true, name: foundUser.name });
+      } else {
+        // Incorrect password
+        res.json({ success: false, message: "Incorrect password" });
+      }
+    } else {
+      // User not found
+      res.json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: "Error checking user", error });
+  }
+});
+
+// User Data Route
+app.get("/userdata", async (req, res) => {
+  try {
+    const { name } = req.query;
+    
+    if (!name) {
+      return res.status(400).json({ success: false, message: "Name query parameter is required" });
+    }
+
+    const user = await User.findOne({ name });
+    
+    if (user) {
+      res.json({ success: true, user });
+    } else {
+      res.json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ message: "Error fetching user data", error });
+  }
+});
+
+// Create Event Route
+app.post('/events', async (req, res) => {
+  try {
+    const { title, description, date, location, userid, task_ids, participant_ids } = req.body;
+
+    // Validate the incoming data
+    if (!title || !description || !date || !location || !userid) {
+      return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    }
+
+    const eventid = Date.now(); // Generate a unique eventid
+
+    const newEvent = new Event({ eventid, title, description, date, location, userid, task_ids, participant_ids });
+    await newEvent.save();
+    res.status(201).json({ success: true, message: 'Event created successfully' });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    res.status(500).json({ success: false, message: 'Error creating event', error: error.message });
+  }
+});
+
+// Get All Events Route
+app.get("/events", async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.json({ success: true, events });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching events", error });
+  }
+});
+
+// Get Single Event Route
+app.get("/events/:id", async (req, res) => {
+  try {
+    const event = await Event.findOne({ eventid: req.params.id });
+    if (event) {
+      res.json({ success: true, event });
+    } else {
+      res.status(404).json({ success: false, message: "Event not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching event", error });
+  }
+});
+
+// Update Event Route
+app.put("/events/:id", async (req, res) => {
+  try {
+    const { title, description, date, location } = req.body;
+    const updatedEvent = await Event.findOneAndUpdate(
+      { eventid: req.params.id },
+      { title, description, date, location },
+      { new: true }
+    );
+    if (updatedEvent) {
+      res.json({ success: true, message: "Event updated successfully", event: updatedEvent });
+    } else {
+      res.status(404).json({ success: false, message: "Event not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error updating event", error });
+  }
+});
+
+// Delete Event Route
+app.delete("/events/:id", async (req, res) => {
+  try {
+    const deletedEvent = await Event.findOneAndDelete({ eventid: req.params.id });
+    if (deletedEvent) {
+      res.json({ success: true, message: "Event deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Event not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting event", error });
+  }
+});
+
+app.post('/events', async (req, res) => {
+  try {
+    const { title, description, date, location, responsible, participants } = req.body;
+    const newEvent = new Event({ title, description, date, location, responsible, participants: participants.split(',') });
+    await newEvent.save();
+    res.status(201).json({ success: true, message: 'Event created successfully' });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    res.status(500).json({ success: false, message: 'Error creating event', error });
+  }
+});
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+// File: backend\test.js
+// const express = require("express");
+// const cors = require("cors");
+// const mongoose = require("mongoose");
+
+// const app = express();
+// app.use(cors());
+// app.use(express.json());
+
+// // Connect to MongoDB
+// mongoose.connect("mongodb://127.0.0.1:27017/eventure")
+//   .then(() => console.log("DB connection successful"))
+//   .catch(() => console.log("DB connection failed"));
+
+// // Define the User schema and model
+// const userSchema = new mongoose.Schema({
+//   username: String,
+//   password: String
+// });
+
+// const User = mongoose.model('User', userSchema);
+
+// // Signup Route
+// app.post("/signup", async (req, res) => {
+//   try {
+//     const { username, password } = req.body;
+//     // console.log(username)
+//     // console.log(password)
+//     const existingUser = await User.findOne({ username });
+
+//     if (existingUser) {
+//       return res.status(400).json({ message: "Username already exists" });
+//     }
+
+//     const newUser = new User({ username, password });
+//     await newUser.save();
+//     res.status(201).json({ message: "User created successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error creating user", error });
+//   }
+// });
+
+// // Login Route
+// app.post("/check", async (req, res) => {
+//   try {
+//     const { user, pass } = req.body;
+//     // console.log('Request Body:', req.body); // Log the incoming request body
+
+//     // Find the user in the database
+//     const foundUser = await User.findOne({ username: user });
+//     // console.log('Found User:', foundUser); // Log the result of the find operation
+
+//     if (foundUser) {
+//       // Compare the password in plain text
+//       if (foundUser.password === pass) {
+//         res.json(true);
+//       } else {
+//         res.json(false);
+//       }
+//     } else {
+//       res.json(false);
+//     }
+//   } catch (error) {
+//     console.error('Error during login:', error);
+//     res.status(500).json({ message: "Error checking user", error });
+//   }
+// });
+
+
+// const PORT = 5000;
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
+
+
+// File: backend\config\db.js
+const mongoose = require("mongoose");
+
+const connectDB = async () => {
+    await mongoose.connect("mongodb://127.0.0.1:27017/eventuretwo")
+    .then(() => console.log("DB connection successful"))
+    .catch(() => console.log("DB connection failed"))
+};
+
+module.exports = connectDB;
+
+
+
+
+// File: backend\models\event.js
+const mongoose = require('mongoose');
+
+const eventSchema = new mongoose.Schema({
+  eventid: { type: Number, required: true, unique: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  date: { type: Date, required: true },
+  location: { type: String, required: true },
+  userid: { type: Number, ref: 'User', required: true },  // Reference to User collection
+  task_ids: [{ type: Number, ref: 'Task' }],  // Array of task IDs
+  participant_ids: [{ type: Number, ref: 'Participant' }]  // Array of participant IDs
+});
+
+const Event = mongoose.model('Event', eventSchema);
+
+module.exports = Event;
+
+
+// File: backend\models\participant.js
+const mongoose = require('mongoose');
+
+const participantSchema = new mongoose.Schema({
+  participantid: { type: Number, required: true, unique: true },
+  userid: { type: Number, ref: 'User', required: true },  // Reference to User collection
+  eventid: { type: Number, ref: 'Event', required: true },  // Reference to Event collection
+  role: { type: String, required: true }
+});
+
+const Participant = mongoose.model('Participant', participantSchema);
+
+module.exports = Participant;
+
+
+// File: backend\models\task.js
+const mongoose = require('mongoose');
+
+const taskSchema = new mongoose.Schema({
+  taskid: { type: Number, required: true, unique: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  status: { type: String, required: true },
+  deadline: { type: Date, required: true },
+  eventid: { type: Number, ref: 'Event', required: true },  // Reference to Event collection
+  assigneeid: { type: Number, ref: 'User', required: true }  // Reference to User collection
+});
+
+const Task = mongoose.model('Task', taskSchema);
+
+module.exports = Task;
+
+
+// File: backend\models\user.js
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  userid: { type: Number, required: true, unique: true },
+  name: { type: String, required: true },
+  password: { type: String, required: true },
+  task_ids: [{ type: Number, ref: 'Task' }],  // Array of task IDs
+  participating_event_ids: [{ type: Number, ref: 'Event' }]  // Array of event IDs
+});
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+
+
+
+
+
+
+
+// const mongoose = require("mongoose");
+
+// const userSchema = new mongoose.Schema({
+//   username: { type: String, required: true, unique: true },
+//   password: { type: String, required: true },
+// });
+
+// const User = mongoose.model('User', userSchema);
+
+// module.exports = User;
+
+
