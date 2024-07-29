@@ -17,20 +17,44 @@ const getNextEventId = async () => {
   return lastEvent ? lastEvent.eventid + 1 : 1;
 };
 
+// Utility function to get the next user ID
+const getNextUserId = async () => {
+  try {
+    const lastUser = await User.findOne().sort({ userid: -1 });
+    return lastUser ? lastUser.userid + 1 : 1;
+  } catch (error) {
+    console.error('Error getting next user ID:', error);
+    throw new Error('Could not get the next user ID');
+  }
+};
+
 // Signup Route
 app.post("/signup", async (req, res) => {
   try {
-    const { name, password } = req.body;
-    const existingUser = await User.findOne({ name });
+    const { username, password } = req.body;
+
+    // Validate that both fields are provided
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ username });
 
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    const newUser = new User({ userid: Date.now(), name, password });
+    // Get the next user ID
+    const nextUserId = await getNextUserId();
+
+    // Create a new user
+    const newUser = new User({ userid: nextUserId, username, password });
     await newUser.save();
+
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
+    console.error('Error during signup:', error);
     res.status(500).json({ message: "Error creating user", error });
   }
 });
@@ -54,28 +78,6 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: "Error checking user", error });
-  }
-});
-
-// User Data Route
-app.get("/userdata", async (req, res) => {
-  try {
-    const { name } = req.query;
-    
-    if (!name) {
-      return res.status(400).json({ success: false, message: "Name query parameter is required" });
-    }
-
-    const user = await User.findOne({ name });
-    
-    if (user) {
-      res.json({ success: true, user });
-    } else {
-      res.json({ success: false, message: "User not found" });
-    }
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    res.status(500).json({ message: "Error fetching user data", error });
   }
 });
 

@@ -11,12 +11,12 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
-    
+
     try {
       const response = await axios.post('http://localhost:5000/signup', { username, password });
       if (response.data.message === "User created successfully") {
@@ -25,7 +25,7 @@ function Signup() {
         setError(response.data.message || 'Signup failed.');
       }
     } catch (error) {
-      console.error('There was an error!', error);
+      console.error('There was an error!', error.response ? error.response.data : error.message);
       setError('An error occurred. Please try again.');
     }
   };
