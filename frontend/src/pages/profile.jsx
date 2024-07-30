@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../common/header';
+import Header from '../components/header';
 import axios from 'axios';
 
 function Profile() {

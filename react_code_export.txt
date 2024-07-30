@@ -92,29 +92,33 @@ root.render(
 // File: frontend/src\authentication\login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import axios from 'axios';
 
 function Login() {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState(''); // Change 'name' to 'username'
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  async function check(e) {
+  async function handleLogin(e) {
     e.preventDefault(); // Prevent default form submission
-
+ 
     try {
-      const response = await axios.post('http://localhost:5000/login', { name, password });
+      const response = await axios.post('http://localhost:5000/login', { username, password }); // Change 'name' to 'username'
+      console.log('API Response:', response.data); // Log response for debugging
       if (response.data.success) {
-        // Store the name in local storage
-        localStorage.setItem('name', response.data.name);
-        
+        // Store the username and token in local storage
+        console.log(response.data)
+        localStorage.setItem('username', response.data.username); // Change 'name' to 'username'
+        localStorage.setItem('token', response.data.token); // Ensure 'token' is returned from the backend
+ 
         // Navigate to the dashboard
         navigate('/dashboard');
       } else {
         setError(response.data.message || 'Invalid username or password');
       }
     } catch (error) {
+      console.error('Login Error:', error); // Log error for debugging
       setError('An error occurred. Please try again.');
     }
   };
@@ -124,31 +128,38 @@ function Login() {
       <div className="bg-white p-8 rounded shadow-md mx-52">
         <h1 className="text-2xl font-bold mb-6">Login to Eventure</h1>
 
-        <form onSubmit={check}>
+        <form onSubmit={handleLogin}>
           <div className="mb-4">
-            <label htmlFor="name" className="block mb-2">Username</label>
+            <label htmlFor="username" className="block mb-2 text-gray-700">Username</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              id="username"
+              name="username" // Change 'name' to 'username'
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              required
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-2">Password</label>
+            <label htmlFor="password" className="block mb-2 text-gray-700">Password</label>
             <input
               type="password"
               id="password"
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              required
             />
           </div>
           <div className="mb-4">
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Login</button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Login
+            </button>
           </div>
           {error && <div className="text-red-600">{error}</div>}
         </form>
@@ -440,34 +451,76 @@ export default EditEvent;
 
 
 // File: frontend/src\common\header.jsx
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+
 function Header() {
-    return (
-        <div>
-            <nav className="bg-gray-800 text-white p-4 text-center">
-                <Link to="/dashboard" className="mx-2">Home</Link>
-                <Link to="/events" className="mx-2">Events</Link>
-                <Link to="/tasks" className="mx-2">Tasks</Link>
-                <Link to="/profile" className="mx-2">Profile</Link>
-                <Link to="" className="mx-2">Logout</Link>
-            </nav>
-        </div>
-    )
+  const handleLogout = () => {
+    localStorage.clear(); // Clear all local storage data
+    window.location.href = '/login'; // Redirect to login page
+  };
+
+  return (
+    <div>
+      <nav className="bg-gray-800 text-white p-4 text-center">
+        <Link to="/dashboard" className="mx-2">Home</Link>
+        <Link to="/events" className="mx-2">Events</Link>
+        <Link to="/tasks" className="mx-2">Tasks</Link>
+        <Link to="/profile" className="mx-2">Profile</Link>
+        <button onClick={handleLogout} className="mx-2">Logout</button>
+      </nav>
+    </div>
+  );
 }
 
-export default Header
+export default Header;
+
 
 // File: frontend/src\pages\dashboard.jsx
-import Header from "../common/header";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import Header from '../common/header';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 function Dashboard() {
+  const [events, setEvents] = useState([]);
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    // Fetch username from local storage
+    const storedUsername = localStorage.getItem('username');
+    console.log('Retrieved username:', storedUsername); // Debugging
+    setUsername(storedUsername || 'Guest');
+
+    // Fetch upcoming events
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/events');
+        if (response.data.success) {
+          const now = new Date();
+          const upcomingEvents = response.data.events.filter(event => new Date(event.date) >= now);
+          setEvents(upcomingEvents);
+        } else {
+          console.error('Failed to fetch events');
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Get the date part only in yyyy-MM-dd format
+  };
+
   return (
     <div>
       <Header />
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center py-4">
-          <h1 className="text-2xl">Welcome, {}</h1>
+          <h1 className="text-2xl">Welcome, {username}</h1>
           <Link to="/createevent">
             <button className="px-4 py-2 bg-blue-500 text-white rounded">
               Create New Event
@@ -476,8 +529,15 @@ function Dashboard() {
         </div>
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Upcoming Events</h2>
-          <p>Event 1: Conference on Web Development - Date: 2024-02-15</p>
-          <p>Event 2: Tech Networking Meetup - Date: 2024-03-05</p>
+          {events.length > 0 ? (
+            events.map((event, index) => (
+              <p key={event.eventid}>
+                Event {index + 1}: {event.title} - Date: {formatDate(event.date)}
+              </p>
+            ))
+          ) : (
+            <p>No upcoming events available</p>
+          )}
         </div>
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Your Tasks</h2>
@@ -506,6 +566,7 @@ function Events() {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:5000/events');
+        // console.log(response.data)
         if (response.data.success) {
           setEvents(response.data.events);
         } else {
@@ -581,10 +642,37 @@ export default Events;
 
 
 // File: frontend/src\pages\profile.jsx
-import Header from "../common/header"
-
+import React, { useEffect, useState } from 'react';
+import Header from '../common/header';
+import axios from 'axios';
 
 function Profile() {
+  const [pastEvents, setPastEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/events');
+        if (response.data.success) {
+          const now = new Date();
+          const pastEventsList = response.data.events.filter(event => new Date(event.date) < now);
+          setPastEvents(pastEventsList);
+        } else {
+          console.error('Failed to fetch events');
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Get the date part only in yyyy-MM-dd format
+  };
+
   return (
     <div>
       <Header />
@@ -592,7 +680,7 @@ function Profile() {
         <div className="text-center py-4">
           <h1 className="text-2xl">Profile Management</h1>
         </div>
-        
+
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Change Password</h2>
           <form>
@@ -615,19 +703,25 @@ function Profile() {
         </div>
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Past Events and Activities</h2>
-          <ul className="list-disc pl-5">
-            <li>Event 1: Tech Conference - Date: 2023-06-15</li>
-            <li>Event 2: Annual Meetup - Date: 2023-09-10</li>
-            {/* Additional past events can be listed here */}
-          </ul>
+          {pastEvents.length > 0 ? (
+            <ul className="list-disc pl-5">
+              {pastEvents.map((event, index) => (
+                <li key={event.eventid}>
+                  Event {index + 1}: {event.title} - Date: {formatDate(event.date)}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No past events available</p>
+          )}
         </div>
       </div>
     </div>
-
-  )
+  );
 }
 
-export default Profile
+export default Profile;
+
 
 // File: frontend/src\pages\tasks.jsx
 import Header from "../common/header"
@@ -744,16 +838,15 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// Login Route
 app.post("/login", async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { username, password } = req.body; // Ensure it matches the frontend
 
-    const foundUser = await User.findOne({ name });
+    const foundUser = await User.findOne({ username }); // Match with 'username'
 
     if (foundUser) {
       if (foundUser.password === password) {
-        res.json({ success: true, name: foundUser.name });
+        res.json({ success: true, username: foundUser.username, token: "dummy-token" }); // Ensure response includes 'username' and 'token'
       } else {
         res.json({ success: false, message: "Incorrect password" });
       }

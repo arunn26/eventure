@@ -7,8 +7,8 @@ import Home from "./home";
 // import Create from "./buttons/createevent"
 import Login from "./authentication/login"
 import Signup from "./authentication/signup";
-import EditEvent from './buttons/editevent';
-import CreateEvent from './buttons/createevent';
+import EditEvent from './events/editevent';
+import CreateEvent from './events/createevent';
 
 
 
