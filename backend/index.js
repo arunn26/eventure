@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const User = require("./models/user");
 const Event = require("./models/event");
+const { getNextUserId , getNextEventId} = require('./utils/idUtils');
 
 const app = express();
 app.use(cors());
@@ -11,22 +12,7 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
-// Utility function to get the next event ID
-const getNextEventId = async () => {
-  const lastEvent = await Event.findOne().sort({ eventid: -1 });
-  return lastEvent ? lastEvent.eventid + 1 : 1;
-};
 
-// Utility function to get the next user ID
-const getNextUserId = async () => {
-  try {
-    const lastUser = await User.findOne().sort({ userid: -1 });
-    return lastUser ? lastUser.userid + 1 : 1;
-  } catch (error) {
-    console.error('Error getting next user ID:', error);
-    throw new Error('Could not get the next user ID');
-  }
-};
 
 // Signup Route
 app.post("/signup", async (req, res) => {
@@ -163,6 +149,7 @@ app.delete("/events/:id", async (req, res) => {
     res.status(500).json({ message: "Error deleting event", error });
   }
 });
+
 
 const PORT = 5000;
 app.listen(PORT, () => {
