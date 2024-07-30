@@ -11,6 +11,7 @@ function Events() {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:5000/events');
+        // console.log(response.data)
         if (response.data.success) {
           setEvents(response.data.events);
         } else {

@@ -59,16 +59,15 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// Login Route
 app.post("/login", async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { username, password } = req.body; // Ensure it matches the frontend
 
-    const foundUser = await User.findOne({ name });
+    const foundUser = await User.findOne({ username }); // Match with 'username'
 
     if (foundUser) {
       if (foundUser.password === password) {
-        res.json({ success: true, name: foundUser.name });
+        res.json({ success: true, username: foundUser.username, token: "dummy-token" }); // Ensure response includes 'username' and 'token'
       } else {
         res.json({ success: false, message: "Incorrect password" });
       }
