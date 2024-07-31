@@ -8,8 +8,8 @@ import Home from "./home";
 // import Create from "./buttons/createevent"
 import Login from "./authentication/login"
 import Signup from "./authentication/signup";
-import EditEvent from './buttons/editevent';
-import CreateEvent from './buttons/createevent';
+import EditEvent from './events/editevent';
+import CreateEvent from './events/createevent';
 
 
 
@@ -95,33 +95,32 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
-  const [username, setUsername] = useState(''); // Change 'name' to 'username'
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   async function handleLogin(e) {
-    e.preventDefault(); // Prevent default form submission
- 
+    e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:5000/login', { username, password }); // Change 'name' to 'username'
-      console.log('API Response:', response.data); // Log response for debugging
+      const response = await axios.post('http://localhost:5000/login', { username, password });
+      console.log('API Response:', response.data);
+
       if (response.data.success) {
-        // Store the username and token in local storage
-        console.log(response.data)
-        localStorage.setItem('username', response.data.username); // Change 'name' to 'username'
-        localStorage.setItem('token', response.data.token); // Ensure 'token' is returned from the backend
- 
+        // Store the username, userId, and token in local storage
+        localStorage.setItem('username', response.data.username);
+        localStorage.setItem('userId', response.data.userId);  // Save userId
         // Navigate to the dashboard
         navigate('/dashboard');
       } else {
         setError(response.data.message || 'Invalid username or password');
       }
     } catch (error) {
-      console.error('Login Error:', error); // Log error for debugging
+      console.error('Login Error:', error);
       setError('An error occurred. Please try again.');
     }
-  };
+  }
 
   return (
     <div className="container mx-auto p-20">
@@ -134,7 +133,7 @@ function Login() {
             <input
               type="text"
               id="username"
-              name="username" // Change 'name' to 'username'
+              name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
@@ -260,7 +259,32 @@ function Signup() {
 export default Signup;
 
 
-// File: frontend/src\buttons\createevent.jsx
+// File: frontend/src\components\header.jsx
+import { Link } from 'react-router-dom';
+
+function Header() {
+  const handleLogout = () => {
+    localStorage.clear(); // Clear all local storage data
+    window.location.href = '/login'; // Redirect to login page
+  };
+
+  return (
+    <div>
+      <nav className="bg-gray-800 text-white p-4 text-center">
+        <Link to="/dashboard" className="mx-2">Home</Link>
+        <Link to="/events" className="mx-2">Events</Link>
+        <Link to="/tasks" className="mx-2">Tasks</Link>
+        <Link to="/profile" className="mx-2">Profile</Link>
+        <button onClick={handleLogout} className="mx-2">Logout</button>
+      </nav>
+    </div>
+  );
+}
+
+export default Header;
+
+
+// File: frontend/src\events\createevent.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -346,8 +370,7 @@ function CreateEvent() {
 
 export default CreateEvent;
 
-
-// File: frontend/src\buttons\editevent.jsx
+// File: frontend/src\events\editevent.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -450,34 +473,9 @@ function EditEvent() {
 export default EditEvent;
 
 
-// File: frontend/src\common\header.jsx
-import { Link } from 'react-router-dom';
-
-function Header() {
-  const handleLogout = () => {
-    localStorage.clear(); // Clear all local storage data
-    window.location.href = '/login'; // Redirect to login page
-  };
-
-  return (
-    <div>
-      <nav className="bg-gray-800 text-white p-4 text-center">
-        <Link to="/dashboard" className="mx-2">Home</Link>
-        <Link to="/events" className="mx-2">Events</Link>
-        <Link to="/tasks" className="mx-2">Tasks</Link>
-        <Link to="/profile" className="mx-2">Profile</Link>
-        <button onClick={handleLogout} className="mx-2">Logout</button>
-      </nav>
-    </div>
-  );
-}
-
-export default Header;
-
-
 // File: frontend/src\pages\dashboard.jsx
 import React, { useEffect, useState } from 'react';
-import Header from '../common/header';
+import Header from '../components/header';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -486,12 +484,6 @@ function Dashboard() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    // Fetch username from local storage
-    const storedUsername = localStorage.getItem('username');
-    console.log('Retrieved username:', storedUsername); // Debugging
-    setUsername(storedUsername || 'Guest');
-
-    // Fetch upcoming events
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:5000/events');
@@ -507,7 +499,11 @@ function Dashboard() {
       }
     };
 
-    fetchEvents();
+    // Fetch username from local storage
+    const storedUsername = localStorage.getItem('username');
+    setUsername(storedUsername || 'Guest');
+
+    fetchEvents();    
   }, []);
 
   const formatDate = (dateString) => {
@@ -541,8 +537,7 @@ function Dashboard() {
         </div>
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Your Tasks</h2>
-          <div className="bg-gray-200 p-2 mb-2">Task 1: Prepare presentation for the conference</div>
-          <div className="bg-gray-200 p-2 mb-2">Task 2: Coordinate with tech meetup speakers</div>
+          {}
         </div>
       </div>
     </div>
@@ -554,7 +549,7 @@ export default Dashboard;
 
 // File: frontend/src\pages\events.jsx
 import React, { useEffect, useState } from 'react';
-import Header from '../common/header';
+import Header from '../components/header';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -643,11 +638,51 @@ export default Events;
 
 // File: frontend/src\pages\profile.jsx
 import React, { useEffect, useState } from 'react';
-import Header from '../common/header';
+import Header from '../components/header';
 import axios from 'axios';
 
 function Profile() {
   const [pastEvents, setPastEvents] = useState([]);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [userId, setUserId] = useState(null); // Add state for userId
+
+  useEffect(() => {
+    // Retrieve userId from local storage
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(storedUserId);
+    } else {
+      setMessage('User ID not found. Please log in again.');
+    }
+  }, []);
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setMessage('New passwords do not match');
+      return;
+    }
+
+    if (!userId) {
+      setMessage('User ID is not available');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/changepassword', {
+        userId,          
+        currentPassword,
+        newPassword,
+      });
+      setMessage(response.data.message);
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setMessage('Error changing password');
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -658,7 +693,7 @@ function Profile() {
           const pastEventsList = response.data.events.filter(event => new Date(event.date) < now);
           setPastEvents(pastEventsList);
         } else {
-          console.error('Failed to fetch events');
+          console.error('Failed to fetch events:', response.data.message);
         }
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -683,24 +718,56 @@ function Profile() {
 
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Change Password</h2>
-          <form>
+          <form onSubmit={handlePasswordChange}>
             <div className="mb-4">
               <label htmlFor="currentPassword" className="block mb-2">Current Password</label>
-              <input type="password" id="currentPassword" name="currentPassword" className="w-full p-2 border border-gray-300 rounded" />
+              <input
+                type="password"
+                id="currentPassword"
+                name="currentPassword"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
             </div>
             <div className="mb-4">
               <label htmlFor="newPassword" className="block mb-2">New Password</label>
-              <input type="password" id="newPassword" name="newPassword" className="w-full p-2 border border-gray-300 rounded" />
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
             </div>
             <div className="mb-4">
               <label htmlFor="confirmPassword" className="block mb-2">Confirm New Password</label>
-              <input type="password" id="confirmPassword" name="confirmPassword" className="w-full p-2 border border-gray-300 rounded" />
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
             </div>
             <div className="mb-4">
-              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Change Password</button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                disabled={!userId} // Disable button if userId is not available
+              >
+                Change Password
+              </button>
             </div>
           </form>
+          {message && <p className="text-red-500">{message}</p>}
         </div>
+
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Past Events and Activities</h2>
           {pastEvents.length > 0 ? (
@@ -724,57 +791,153 @@ export default Profile;
 
 
 // File: frontend/src\pages\tasks.jsx
-import Header from "../common/header"
-function Tasks() {
-  return (
-    <div>
-      <Header />
-      <div className="container mx-auto p-4">
-        <div className="text-center py-4">
-          <h1 className="text-2xl">Create New Task</h1>
-        </div>
-        <div className="bg-white p-4 mt-4 shadow-sm">
-          <form>
-            <div className="mb-4">
-              <label htmlFor="relatedEvent" className="block mb-2">Related Event</label>
-              <select id="relatedEvent" name="relatedEvent" className="w-full p-2 border border-gray-300 rounded">
-                <option value="event1">Event 1: Tech Conference</option>
-                <option value="event2">Event 2: Annual Meetup</option>
-                {/* Additional event options can be added here */}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="taskTitle" className="block mb-2">Task Title</label>
-              <input type="text" id="taskTitle" name="taskTitle" className="w-full p-2 border border-gray-300 rounded" />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="taskDescription" className="block mb-2">Task Description</label>
-              <textarea id="taskDescription" name="taskDescription" className="w-full p-2 border border-gray-300 rounded"></textarea>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="taskDeadline" className="block mb-2">Deadline</label>
-              <input type="date" id="taskDeadline" name="taskDeadline" className="w-full p-2 border border-gray-300 rounded" />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="taskAssignee" className="block mb-2">Assignee</label>
-              <select id="taskAssignee" name="taskAssignee" className="w-full p-2 border border-gray-300 rounded">
-                <option value="user1">User 1</option>
-                <option value="user2">User 2</option>
-                <option value="user3">User 3</option>
-                {/* Additional user options can be added here */}
-              </select>
-            </div>
-            <div className="mb-4">
-              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Create Task</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
-}
+import React, { useState, useEffect } from 'react';
+import Header from '../components/header';
+import axios from 'axios';
 
-export default Tasks
+const Tasks = () => {
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [taskDeadline, setTaskDeadline] = useState('');
+  const [selectedEvent, setSelectedEvent] = useState('');
+  const [selectedAssignee, setSelectedAssignee] = useState('');
+  const [taskStatus, setTaskStatus] = useState('');
+  const [events, setEvents] = useState([]);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/events');
+        setEvents(response.data.events);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/users');
+        setUsers(response.data.users);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchEvents();
+    fetchUsers();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:5000/tasks', {
+        title: taskTitle,
+        description: taskDescription,
+        deadline: taskDeadline,
+        eventid: selectedEvent,
+        assigneeid: selectedAssignee,
+        status: taskStatus,
+      });
+      alert('Task created successfully');
+      // Clear form fields
+      setTaskTitle('');
+      setTaskDescription('');
+      setTaskDeadline('');
+      setSelectedEvent('');
+      setSelectedAssignee('');
+      setTaskStatus('');
+    } catch (error) {
+      console.error('Error creating task:', error);
+      alert('Error creating task');
+    }
+  };
+
+  return (
+    <div><Header />
+    <div className="container mx-auto p-4">
+      
+      <h1 className="text-2xl font-bold mb-4">Create New Task</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+          <label htmlFor="event" className="block text-sm font-medium text-gray-700">Related Event</label>
+          <select
+            id="event"
+            value={selectedEvent}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            required
+          >
+            <option value="">Select an Event</option>
+            {events.map((event) => (
+              <option key={event.eventid} value={event.eventid}>
+                {event.title}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
+          <input
+            id="title"
+            type="text"
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+          <input
+            id="description"
+            type="text"
+            value={taskDescription}
+            onChange={(e) => setTaskDescription(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="deadline" className="block text-sm font-medium text-gray-700">Deadline</label>
+          <input
+            id="deadline"
+            type="date"
+            value={taskDeadline}
+            onChange={(e) => setTaskDeadline(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            required
+          />
+        </div>
+ 
+        <div>
+          <label htmlFor="assignee" className="block text-sm font-medium text-gray-700">Assignee</label>
+          <select
+            id="assignee"
+            value={selectedAssignee}
+            onChange={(e) => setSelectedAssignee(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            required
+          >
+            <option value="">Select an Assignee</option>
+            {users.map((user) => (
+              <option key={user.userid} value={user.userid}>
+                {user.username}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Create Task
+        </button>
+      </form>
+    </div>
+    </div>
+  );
+};
+
+export default Tasks;
+
 
 // File: backend\index.js
 const express = require("express");
@@ -782,6 +945,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const User = require("./models/user");
 const Event = require("./models/event");
+const { getNextUserId} = require('./utils/idUtils');
 
 const app = express();
 app.use(cors());
@@ -790,22 +954,7 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
-// Utility function to get the next event ID
-const getNextEventId = async () => {
-  const lastEvent = await Event.findOne().sort({ eventid: -1 });
-  return lastEvent ? lastEvent.eventid + 1 : 1;
-};
 
-// Utility function to get the next user ID
-const getNextUserId = async () => {
-  try {
-    const lastUser = await User.findOne().sort({ userid: -1 });
-    return lastUser ? lastUser.userid + 1 : 1;
-  } catch (error) {
-    console.error('Error getting next user ID:', error);
-    throw new Error('Could not get the next user ID');
-  }
-};
 
 // Signup Route
 app.post("/signup", async (req, res) => {
@@ -840,13 +989,17 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body; // Ensure it matches the frontend
+    const { username, password } = req.body;
 
-    const foundUser = await User.findOne({ username }); // Match with 'username'
+    const foundUser = await User.findOne({ username });
 
     if (foundUser) {
       if (foundUser.password === password) {
-        res.json({ success: true, username: foundUser.username, token: "dummy-token" }); // Ensure response includes 'username' and 'token'
+        res.json({
+          success: true,
+          username: foundUser.username,
+          userId: foundUser._id,  // Include userId in the response
+        });
       } else {
         res.json({ success: false, message: "Incorrect password" });
       }
@@ -859,45 +1012,93 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Create Event Route
-app.post('/events', async (req, res) => {
+app.post('/changepassword', async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body; // Retrieve userId from request body
+
   try {
-    const { title, description, date, location } = req.body;
-
-    console.log('Received event data:', req.body);
-
-    if (!title || !description || !date || !location) {
-      console.error('Validation failed: Missing required fields');
-      return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const eventid = await getNextEventId(); // Get the next event ID
+    if (currentPassword !== user.password) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
 
-    const newEvent = new Event({ eventid, title, description, date, location });
+    user.password = newPassword;
+    await user.save();
 
-    console.log('New event data:', newEvent);
-
-    await newEvent.save();
-    console.log('Event created successfully');
-    res.status(201).json({ success: true, message: 'Event created successfully' });
+    res.json({ message: 'Password changed successfully' });
   } catch (error) {
-    console.error('Error creating event:', error);
-    res.status(500).json({ success: false, message: 'Error creating event', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Get All Events Route
-app.get("/events", async (req, res) => {
+const eventRoutes = require("./routes/eventRoutes");
+app.use("/events", eventRoutes);
+
+const userRoutes = require('./routes/userRoutes');
+app.use('/users', userRoutes);
+
+const taskRoutes = require('./routes/taskRoutes');
+app.use('/tasks', taskRoutes);
+
+
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+// File: backend\config\db.js
+const mongoose = require("mongoose");
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect("mongodb://127.0.0.1:27017/eventuretwo");
+        console.log("DB connection successful");
+    } catch (error) {
+        console.error("DB connection failed", error);
+    }
+};
+
+module.exports = connectDB;
+
+
+// File: backend\controllers\eventController.js
+const Event = require("../models/event");
+const { getNextEventId } = require("../utils/idUtils");
+
+
+const createEvent = async (req, res) => {
+  try {
+    const { title, description, date, location } = req.body;
+
+    if (!title || !description || !date || !location) {
+      return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    }
+
+    const eventid = await getNextEventId();
+    const newEvent = new Event({ eventid, title, description, date, location });
+    await newEvent.save();
+    res.status(201).json({ success: true, message: 'Event created successfully' });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    res.status(500).json({ success: false, message: 'Error creating event', error });
+  }
+};
+
+const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find();
     res.json({ success: true, events });
   } catch (error) {
     res.status(500).json({ message: "Error fetching events", error });
   }
-});
+};
 
-// Get Single Event Route
-app.get("/events/:id", async (req, res) => {
+const getSingleEvent = async (req, res) => {
   try {
     const event = await Event.findOne({ eventid: req.params.id });
     if (event) {
@@ -908,10 +1109,9 @@ app.get("/events/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error fetching event", error });
   }
-});
+};
 
-// Update Event Route
-app.put("/events/:id", async (req, res) => {
+const updateEvent = async (req, res) => {
   try {
     const { title, description, date, location } = req.body;
     const updatedEvent = await Event.findOneAndUpdate(
@@ -927,10 +1127,9 @@ app.put("/events/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error updating event", error });
   }
-});
+};
 
-// Delete Event Route
-app.delete("/events/:id", async (req, res) => {
+const deleteEvent = async (req, res) => {
   try {
     const deletedEvent = await Event.findOneAndDelete({ eventid: req.params.id });
     if (deletedEvent) {
@@ -941,101 +1140,70 @@ app.delete("/events/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error deleting event", error });
   }
-});
-
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-
-// File: backend\test.js
-// const express = require("express");
-// const cors = require("cors");
-// const mongoose = require("mongoose");
-
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
-
-// // Connect to MongoDB
-// mongoose.connect("mongodb://127.0.0.1:27017/eventure")
-//   .then(() => console.log("DB connection successful"))
-//   .catch(() => console.log("DB connection failed"));
-
-// // Define the User schema and model
-// const userSchema = new mongoose.Schema({
-//   username: String,
-//   password: String
-// });
-
-// const User = mongoose.model('User', userSchema);
-
-// // Signup Route
-// app.post("/signup", async (req, res) => {
-//   try {
-//     const { username, password } = req.body;
-//     // console.log(username)
-//     // console.log(password)
-//     const existingUser = await User.findOne({ username });
-
-//     if (existingUser) {
-//       return res.status(400).json({ message: "Username already exists" });
-//     }
-
-//     const newUser = new User({ username, password });
-//     await newUser.save();
-//     res.status(201).json({ message: "User created successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error creating user", error });
-//   }
-// });
-
-// // Login Route
-// app.post("/check", async (req, res) => {
-//   try {
-//     const { user, pass } = req.body;
-//     // console.log('Request Body:', req.body); // Log the incoming request body
-
-//     // Find the user in the database
-//     const foundUser = await User.findOne({ username: user });
-//     // console.log('Found User:', foundUser); // Log the result of the find operation
-
-//     if (foundUser) {
-//       // Compare the password in plain text
-//       if (foundUser.password === pass) {
-//         res.json(true);
-//       } else {
-//         res.json(false);
-//       }
-//     } else {
-//       res.json(false);
-//     }
-//   } catch (error) {
-//     console.error('Error during login:', error);
-//     res.status(500).json({ message: "Error checking user", error });
-//   }
-// });
-
-
-// const PORT = 5000;
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
-
-// File: backend\config\db.js
-const mongoose = require("mongoose");
-
-const connectDB = async () => {
-    await mongoose.connect("mongodb://127.0.0.1:27017/eventuretwo")
-    .then(() => console.log("DB connection successful"))
-    .catch(() => console.log("DB connection failed"))
 };
 
-module.exports = connectDB;
+module.exports = { createEvent, getAllEvents, getSingleEvent, updateEvent, deleteEvent };
 
 
+// File: backend\controllers\taskController.js
+const Task = require('../models/task');
+const User = require('../models/user');
+const { getNextTaskId } = require('../utils/idUtils');
+
+const createTask = async (req, res) => {
+  try {
+    const { title, description, deadline, eventid, assigneeid } = req.body;
+
+    if (!title || !description || !deadline || !eventid || !assigneeid) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    // Get the next task ID
+    const taskid = await getNextTaskId();
+    const newTask = new Task({ taskid, title, description, deadline, eventid, assigneeid });
+    await newTask.save();
+
+    // Update the user with the new task ID
+    await User.findOneAndUpdate(
+      { userid: assigneeid },
+      { $push: { task_ids: taskid } }
+    );
+
+    res.status(201).json({ success: true, message: 'Task created successfully', task: newTask });
+  } catch (error) {
+    console.error('Error creating task:', error);
+    res.status(500).json({ success: false, message: 'Error creating task', error });
+  }
+};
+
+const getTasksByUser = async (req, res) => {
+  try {
+    const userId = req.params.userid;
+    const tasks = await Task.find({ assigneeid: userId });
+    res.json({ success: true, tasks });
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).json({ message: 'Error fetching tasks', error });
+  }
+};
+
+module.exports = { createTask, getTasksByUser };
+
+
+// File: backend\controllers\userController.js
+const User = require('../models/user');
+
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Error fetching users', error });
+  }
+};
+
+module.exports = { getAllUsers };
 
 
 // File: backend\models\event.js
@@ -1079,10 +1247,9 @@ const taskSchema = new mongoose.Schema({
   taskid: { type: Number, required: true, unique: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
-  status: { type: String, required: true },
   deadline: { type: Date, required: true },
-  eventid: { type: Number, ref: 'Event', required: true },  // Reference to Event collection
-  assigneeid: { type: Number, ref: 'User', required: true }  // Reference to User collection
+  eventid: { type: Number, ref: 'Event', required: true },
+  assigneeid: { type: Number, ref: 'User', required: true }
 });
 
 const Task = mongoose.model('Task', taskSchema);
@@ -1104,4 +1271,79 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+
+// File: backend\routes\eventRoutes.js
+const express = require('express');
+const { createEvent, getAllEvents, getSingleEvent, updateEvent, deleteEvent } = require('../controllers/eventController');
+
+const router = express.Router();
+
+router.post('/', createEvent);
+router.get('/', getAllEvents);
+router.get('/:id', getSingleEvent);
+router.put('/:id', updateEvent);
+router.delete('/:id', deleteEvent);
+
+module.exports = router;
+
+
+// File: backend\routes\taskRoutes.js
+const express = require('express');
+const router = express.Router();
+const { createTask, getTasksByUser } = require('../controllers/taskController');
+
+router.post('/', createTask);
+router.get('/user/:userid', getTasksByUser);
+
+module.exports = router;
+
+
+// File: backend\routes\userRoutes.js
+const express = require('express');
+const { getAllUsers } = require('../controllers/userController');
+
+const router = express.Router();
+
+router.get('/', getAllUsers);
+
+module.exports = router;
+
+
+// File: backend\utils\idUtils.js
+const mongoose = require('mongoose');
+const Task = require('../models/task');
+const Event = require('../models/event'); // Add this line
+
+// Utility function to get the next task ID
+const getNextTaskId = async () => {
+  try {
+    const lastTask = await Task.findOne().sort({ taskid: -1 });
+    return lastTask ? lastTask.taskid + 1 : 1;
+  } catch (error) {
+    console.error('Error getting next task ID:', error);
+    throw new Error('Could not get the next task ID');
+  }
+};
+
+// Existing utility functions
+const getNextEventId = async () => {
+  const lastEvent = await Event.findOne().sort({ eventid: -1 });
+  return lastEvent ? lastEvent.eventid + 1 : 1;
+};
+
+const getNextUserId = async () => {
+  try {
+    const lastUser = await User.findOne().sort({ userid: -1 });
+    return lastUser ? lastUser.userid + 1 : 1;
+  } catch (error) {
+    console.error('Error getting next user ID:', error);
+    throw new Error('Could not get the next user ID');
+  }
+};
+
+
+
+
+module.exports = { getNextTaskId, getNextEventId, getNextUserId };
+
 

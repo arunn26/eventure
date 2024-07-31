@@ -8,12 +8,6 @@ function Dashboard() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    // Fetch username from local storage
-    const storedUsername = localStorage.getItem('username');
-    console.log('Retrieved username:', storedUsername); // Debugging
-    setUsername(storedUsername || 'Guest');
-
-    // Fetch upcoming events
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:5000/events');
@@ -29,7 +23,11 @@ function Dashboard() {
       }
     };
 
-    fetchEvents();
+    // Fetch username from local storage
+    const storedUsername = localStorage.getItem('username');
+    setUsername(storedUsername || 'Guest');
+
+    fetchEvents();    
   }, []);
 
   const formatDate = (dateString) => {
@@ -63,8 +61,7 @@ function Dashboard() {
         </div>
         <div className="bg-white p-4 mt-4 shadow-sm">
           <h2 className="text-xl mb-4">Your Tasks</h2>
-          <div className="bg-gray-200 p-2 mb-2">Task 1: Prepare presentation for the conference</div>
-          <div className="bg-gray-200 p-2 mb-2">Task 2: Coordinate with tech meetup speakers</div>
+          {}
         </div>
       </div>
     </div>

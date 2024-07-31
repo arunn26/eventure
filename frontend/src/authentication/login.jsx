@@ -3,33 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
-  const [username, setUsername] = useState(''); // Change 'name' to 'username'
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   async function handleLogin(e) {
-    e.preventDefault(); // Prevent default form submission
- 
+    e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:5000/login', { username, password }); // Change 'name' to 'username'
-      console.log('API Response:', response.data); // Log response for debugging
+      const response = await axios.post('http://localhost:5000/login', { username, password });
+      console.log('API Response:', response.data);
+
       if (response.data.success) {
-        // Store the username and token in local storage
-        console.log(response.data)
-        localStorage.setItem('username', response.data.username); // Change 'name' to 'username'
-        localStorage.setItem('token', response.data.token); // Ensure 'token' is returned from the backend
- 
+        // Store the username, userId, and token in local storage
+        localStorage.setItem('username', response.data.username);
+        localStorage.setItem('userId', response.data.userId);  // Save userId
         // Navigate to the dashboard
         navigate('/dashboard');
       } else {
         setError(response.data.message || 'Invalid username or password');
       }
     } catch (error) {
-      console.error('Login Error:', error); // Log error for debugging
+      console.error('Login Error:', error);
       setError('An error occurred. Please try again.');
     }
-  };
+  }
 
   return (
     <div className="container mx-auto p-20">
@@ -42,7 +41,7 @@ function Login() {
             <input
               type="text"
               id="username"
-              name="username" // Change 'name' to 'username'
+              name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"

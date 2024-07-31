@@ -3,7 +3,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const User = require("./models/user");
 const Event = require("./models/event");
-const { getNextUserId , getNextEventId} = require('./utils/idUtils');
+const { getNextUserId} = require('./utils/idUtils');
 
 const app = express();
 app.use(cors());
@@ -47,13 +47,17 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body; // Ensure it matches the frontend
+    const { username, password } = req.body;
 
-    const foundUser = await User.findOne({ username }); // Match with 'username'
+    const foundUser = await User.findOne({ username });
 
     if (foundUser) {
       if (foundUser.password === password) {
-        res.json({ success: true, username: foundUser.username, token: "dummy-token" }); // Ensure response includes 'username' and 'token'
+        res.json({
+          success: true,
+          username: foundUser.username,
+          userId: foundUser._id,  // Include userId in the response
+        });
       } else {
         res.json({ success: false, message: "Incorrect password" });
       }
@@ -66,89 +70,37 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Create Event Route
-app.post('/events', async (req, res) => {
+app.post('/changepassword', async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body; // Retrieve userId from request body
+
   try {
-    const { title, description, date, location } = req.body;
-
-    console.log('Received event data:', req.body);
-
-    if (!title || !description || !date || !location) {
-      console.error('Validation failed: Missing required fields');
-      return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const eventid = await getNextEventId(); // Get the next event ID
-
-    const newEvent = new Event({ eventid, title, description, date, location });
-
-    console.log('New event data:', newEvent);
-
-    await newEvent.save();
-    console.log('Event created successfully');
-    res.status(201).json({ success: true, message: 'Event created successfully' });
-  } catch (error) {
-    console.error('Error creating event:', error);
-    res.status(500).json({ success: false, message: 'Error creating event', error: error.message });
-  }
-});
-
-// Get All Events Route
-app.get("/events", async (req, res) => {
-  try {
-    const events = await Event.find();
-    res.json({ success: true, events });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching events", error });
-  }
-});
-
-// Get Single Event Route
-app.get("/events/:id", async (req, res) => {
-  try {
-    const event = await Event.findOne({ eventid: req.params.id });
-    if (event) {
-      res.json({ success: true, event });
-    } else {
-      res.status(404).json({ success: false, message: "Event not found" });
+    if (currentPassword !== user.password) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
     }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching event", error });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Update Event Route
-app.put("/events/:id", async (req, res) => {
-  try {
-    const { title, description, date, location } = req.body;
-    const updatedEvent = await Event.findOneAndUpdate(
-      { eventid: req.params.id },
-      { title, description, date, location },
-      { new: true }
-    );
-    if (updatedEvent) {
-      res.json({ success: true, message: "Event updated successfully", event: updatedEvent });
-    } else {
-      res.status(404).json({ success: false, message: "Event not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Error updating event", error });
-  }
-});
+const eventRoutes = require("./routes/eventRoutes");
+app.use("/events", eventRoutes);
 
-// Delete Event Route
-app.delete("/events/:id", async (req, res) => {
-  try {
-    const deletedEvent = await Event.findOneAndDelete({ eventid: req.params.id });
-    if (deletedEvent) {
-      res.json({ success: true, message: "Event deleted successfully" });
-    } else {
-      res.status(404).json({ success: false, message: "Event not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting event", error });
-  }
-});
+const userRoutes = require('./routes/userRoutes');
+app.use('/users', userRoutes);
+
+const taskRoutes = require('./routes/taskRoutes');
+app.use('/tasks', taskRoutes);
+
 
 
 const PORT = 5000;
