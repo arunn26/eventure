@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function EditEvent() {
@@ -10,19 +10,17 @@ function EditEvent() {
     date: '',
     location: ''
   });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/events/${eventid}`);
-        if (response.data.success) {
-          setEvent(response.data.event);
-        } else {
-          console.error('Failed to fetch event');
-        }
+        setEvent(response.data);
       } catch (error) {
-        console.error('Error fetching event:', error);
+        setError('Error fetching event details.');
       }
     };
 
@@ -36,15 +34,20 @@ function EditEvent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+
     try {
       const response = await axios.put(`http://localhost:5000/events/${eventid}`, event);
       if (response.data.success) {
-        navigate('/events');
+        setSuccess('Event updated successfully!');
+        setTimeout(() => navigate('/events'), 1500);
       } else {
-        console.error('Failed to update event');
+        setError(response.data.message || 'Failed to update event.');
       }
     } catch (error) {
       console.error('Error updating event:', error);
+      setError('An error occurred. Please try again.');
     }
   };
 
@@ -52,6 +55,8 @@ function EditEvent() {
     <div className="bg-gray-100 min-h-screen flex items-center justify-center">
       <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">Edit Event</h1>
+        {error && <div className="text-red-600 mb-4">{error}</div>}
+        {success && <div className="text-green-600 mb-4">{success}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Event Name</label>
@@ -59,7 +64,7 @@ function EditEvent() {
               type="text"
               id="title"
               name="title"
-              value={event.title}
+              value={event.title || ''} // Ensure value is always defined
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
@@ -70,7 +75,7 @@ function EditEvent() {
             <textarea
               id="description"
               name="description"
-              value={event.description}
+              value={event.description || ''} // Ensure value is always defined
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               rows="4"
@@ -83,7 +88,7 @@ function EditEvent() {
               type="date"
               id="date"
               name="date"
-              value={event.date}
+              value={event.date || ''} // Ensure value is always defined
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
@@ -95,7 +100,7 @@ function EditEvent() {
               type="text"
               id="location"
               name="location"
-              value={event.location}
+              value={event.location || ''} // Ensure value is always defined
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required

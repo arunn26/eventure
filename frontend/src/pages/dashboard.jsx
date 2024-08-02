@@ -6,7 +6,7 @@ import axios from 'axios';
 function Dashboard() {
   const [events, setEvents] = useState([]);
   const [username, setUsername] = useState('');
-  const [tasks, setTasks] = useState([]); // State for tasks
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -37,18 +37,17 @@ function Dashboard() {
       }
     };
 
-    // Fetch username from local storage
     const storedUsername = localStorage.getItem('username');
     setUsername(storedUsername || 'Guest');
 
-    fetchEvents();    
+    fetchEvents();
     fetchTasks();
   }, []);
 
   return (
     <div>
       <Header />
-      <div className="container mx-auto p-6">
+      <main className="container mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-semibold">Welcome, {username}</h1>
           <div className="flex space-x-4">
@@ -64,21 +63,21 @@ function Dashboard() {
             </Link>
           </div>
         </div>
-        <div className="bg-white p-6 mb-6 shadow-lg rounded-lg">
+        <section className="bg-white p-6 mb-6 shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           {events.length > 0 ? (
             events.map((event, index) => (
               <div key={event.eventid} className="border-b border-gray-300 py-2 last:border-b-0">
                 <p className="text-lg font-medium">
-                  Event {index + 1}: <span className="text-gray-700">{event.title}</span> - Date: <span className="text-gray-500">{new Date(event.date).toISOString().split('T')[0]}</span>
+                  Event {index + 1}: <span className="text-gray-500">{event.title}</span> - Date: <span className="text-gray-500">{new Date(event.date).toISOString().split('T')[0]}</span>
                 </p>
               </div>
             ))
           ) : (
             <p className="text-gray-500">No upcoming events available</p>
           )}
-        </div>
-        <div className="bg-white p-6 shadow-lg rounded-lg">
+        </section>
+        <section className="bg-white p-6 shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold mb-4">Your Tasks</h2>
           {tasks.length > 0 ? (
             tasks.map((task, index) => (
@@ -91,8 +90,8 @@ function Dashboard() {
           ) : (
             <p className="text-gray-500">No tasks available</p>
           )}
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

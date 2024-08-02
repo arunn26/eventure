@@ -7,7 +7,7 @@ function Header() {
   };
 
   return (
-    <div className="bg-gray-900 text-white shadow-md">
+    <header className="bg-gray-900 text-white shadow-md">
       <nav className="container mx-auto flex justify-between items-center p-4">
         <div className="flex space-x-4">
           <Link to="/dashboard" className="hover:bg-gray-700 px-3 py-2 rounded transition">Home</Link>
@@ -22,7 +22,7 @@ function Header() {
           Logout
         </button>
       </nav>
-    </div>
+    </header>
   );
 }
 

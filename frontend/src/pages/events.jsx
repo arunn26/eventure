@@ -49,12 +49,12 @@ function Events() {
   return (
     <div className="bg-gray-100 min-h-screen">
       <Header />
-      <div className="container mx-auto p-6">
+      <main className="container mx-auto p-6">
         <div className="text-center py-6">
           <h1 className="text-3xl font-semibold text-gray-800">Event Details</h1>
         </div>
         {events.map(event => (
-          <div key={event.eventid} className="bg-white p-6 mb-6 rounded-lg shadow-lg">
+          <section key={event.eventid} className="bg-white p-6 mb-6 rounded-lg shadow-lg">
             <div className="mb-4">
               <h2 className="text-xl font-bold text-gray-700 mb-1">Event Name</h2>
               <p className="text-gray-900">{event.title}</p>
@@ -74,20 +74,20 @@ function Events() {
             <div className="flex space-x-4">
               <button 
                 onClick={() => handleEdit(event.eventid)}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
               >
                 Edit Event
               </button>
               <button 
                 onClick={() => handleDelete(event.eventid)}
-                className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition"
               >
                 Delete Event
               </button>
             </div>
-          </div>
+          </section>
         ))}
-      </div>
+      </main>
     </div>
   );
 }

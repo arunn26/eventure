@@ -44,33 +44,43 @@ function Tasks() {
   return (
     <div>
       <Header />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-6">
         <div className="text-center py-4">
-          <h1 className="text-2xl">Task Details</h1>
+          <h1 className="text-3xl font-semibold">Task Details</h1>
         </div>
         {tasks.length > 0 ? (
           tasks.map(task => (
-            <div key={task.taskid} className="bg-white p-4 mt-4 shadow-sm">
+            <div key={task.taskid} className="bg-white p-6 mt-4 rounded-lg shadow-lg">
               <div className="mb-4">
-                <label className="font-bold">Task Title:</label>
-                <div className="ml-1">{task.title}</div>
+                <label className="font-semibold text-gray-700">Task Title:</label>
+                <div className="text-gray-900">{task.title}</div>
               </div>
               <div className="mb-4">
-                <label className="font-bold">Description:</label>
-                <div className="ml-1">{task.description}</div>
+                <label className="font-semibold text-gray-700">Description:</label>
+                <div className="text-gray-900">{task.description}</div>
               </div>
               <div className="mb-4">
-                <label className="font-bold">Status:</label>
-                <div className="ml-1">{task.status}</div>
+                <label className="font-semibold text-gray-700">Status:</label>
+                <div className="text-gray-900">{task.status}</div>
               </div>
               <div className="flex space-x-4">
-                <button onClick={() => handleEdit(task.taskid)} className="px-4 py-2 bg-blue-500 text-white rounded">Edit Task</button>
-                <button onClick={() => handleDelete(task.taskid)} className="px-4 py-2 bg-red-500 text-white rounded">Delete Task</button>
+                <button
+                  onClick={() => handleEdit(task.taskid)}
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Edit Task
+                </button>
+                <button
+                  onClick={() => handleDelete(task.taskid)}
+                  className="px-4 py-2 bg-red-600 text-white font-semibold rounded-md shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Delete Task
+                </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="bg-white p-4 mt-4 shadow-sm">
+          <div className="bg-white p-6 mt-4 rounded-lg shadow-lg">
             <p>No tasks available</p>
           </div>
         )}

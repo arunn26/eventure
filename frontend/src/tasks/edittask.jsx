@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function EditTask() {
-  const { taskid } = useParams(); // Retrieve taskid from URL parameters
+  const { taskid } = useParams();
   const [task, setTask] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -50,29 +50,29 @@ function EditTask() {
   if (!task) return <p>Loading...</p>;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl">Edit Task</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-semibold mb-4">Edit Task</h1>
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg">
         <div className="mb-4">
-          <label className="font-bold">Title:</label>
+          <label className="font-semibold text-gray-700">Title:</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="ml-1 p-2 border border-gray-300 rounded"
+            className="ml-1 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </div>
         <div className="mb-4">
-          <label className="font-bold">Description:</label>
+          <label className="font-semibold text-gray-700">Description:</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="ml-1 p-2 border border-gray-300 rounded"
+            className="ml-1 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </div>
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
           Update Task
         </button>
       </form>

@@ -25,7 +25,6 @@ function Signup() {
         setError(response.data.message || 'Signup failed.');
       }
     } catch (error) {
-      console.error('There was an error!', error.response ? error.response.data : error.message);
       setError('An error occurred. Please try again.');
     }
   };
@@ -71,15 +70,13 @@ function Signup() {
               required
             />
           </div>
-          <div className="mb-6">
-            <button
-              type="submit"
-              className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Sign Up
-            </button>
-          </div>
-          {error && <div className="text-red-600 text-center">{error}</div>}
+          <button
+            type="submit"
+            className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Sign Up
+          </button>
+          {error && <div className="text-red-600 text-center mt-4">{error}</div>}
         </form>
       </div>
     </div>

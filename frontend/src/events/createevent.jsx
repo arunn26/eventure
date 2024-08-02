@@ -9,6 +9,8 @@ function CreateEvent() {
     date: '',
     location: ''
   });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,17 +20,25 @@ function CreateEvent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting event:', event); // Log the event data before submission
+    setError('');
+    setSuccess('');
+    
+    if (!event.title || !event.description || !event.date || !event.location) {
+      setError('All fields are required.');
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/events', event);
-      console.log('Response from server:', response.data); // Log the response from the server
       if (response.data.success) {
-        navigate('/events');
+        setSuccess('Event created successfully!');
+        setTimeout(() => navigate('/events'), 1500);
       } else {
-        console.error('Failed to create event:', response.data.message);
+        setError(response.data.message || 'Failed to create event.');
       }
     } catch (error) {
       console.error('Error creating event:', error);
+      setError('An error occurred. Please try again.');
     }
   };
 
@@ -36,6 +46,8 @@ function CreateEvent() {
     <div className="bg-gray-100 min-h-screen flex items-center justify-center">
       <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">Create New Event</h1>
+        {error && <div className="text-red-600 mb-4">{error}</div>}
+        {success && <div className="text-green-600 mb-4">{success}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Event Name</label>

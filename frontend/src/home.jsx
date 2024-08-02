@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-// import { FaCalendarPlus, FaSignInAlt } from 'react-icons/fa'; // Optional if you decide to use icons
 
 const Home = () => {
   return (
@@ -17,7 +16,6 @@ const Home = () => {
             <p className="text-gray-700 mb-4">Create an account to start managing your events. It's quick and easy!</p>
             <Link to="/signup">
               <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
-                {/* <FaCalendarPlus className="inline-block mr-2" /> */}
                 Signup
               </button>
             </Link>
@@ -27,7 +25,6 @@ const Home = () => {
             <p className="text-gray-700 mb-4">Already have an account? Log in to access your events and more.</p>
             <Link to="/login">
               <button className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
-                {/* <FaSignInAlt className="inline-block mr-2" /> */}
                 Login
               </button>
             </Link>

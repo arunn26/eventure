@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const User = require("./models/user");
-const Event = require("./models/event");
-const { getNextUserId} = require('./utils/idUtils');
+const Task = require("./models/task");
+const { getNextUserId, getNextTaskId } = require('./utils/idUtils');
 
 const app = express();
 app.use(cors());
@@ -101,6 +101,78 @@ app.use('/users', userRoutes);
 const taskRoutes = require('./routes/taskRoutes');
 app.use('/tasks', taskRoutes);
 
+// Task Routes
+app.post("/tasks", async (req, res) => {
+  try {
+    const { title, description, status } = req.body;
+
+    if (!title || !description || !status) {
+      return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    }
+
+    const taskid = await getNextTaskId();
+    const newTask = new Task({ taskid, title, description, status });
+    await newTask.save();
+    res.status(201).json({ success: true, message: 'Task created successfully' });
+  } catch (error) {
+    console.error('Error creating task:', error);
+    res.status(500).json({ success: false, message: 'Error creating task', error });
+  }
+});
+
+app.get("/tasks", async (req, res) => {
+  try {
+    const tasks = await Task.find();
+    res.json({ success: true, tasks });
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).json({ success: false, message: 'Error fetching tasks', error });
+  }
+});
+
+app.get("/tasks/:id", async (req, res) => {
+  try {
+    const task = await Task.findOne({ taskid: req.params.id });
+    if (task) {
+      res.json({ success: true, task });
+    } else {
+      res.status(404).json({ success: false, message: "Task not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching task", error });
+  }
+});
+
+app.put("/tasks/:id", async (req, res) => {
+  try {
+    const { title, description, status } = req.body;
+    const updatedTask = await Task.findOneAndUpdate(
+      { taskid: req.params.id },
+      { title, description, status },
+      { new: true }
+    );
+    if (updatedTask) {
+      res.json({ success: true, message: "Task updated successfully", task: updatedTask });
+    } else {
+      res.status(404).json({ success: false, message: "Task not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error updating task", error });
+  }
+});
+
+app.delete("/tasks/:id", async (req, res) => {
+  try {
+    const deletedTask = await Task.findOneAndDelete({ taskid: req.params.id });
+    if (deletedTask) {
+      res.json({ success: true, message: "Task deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Task not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting task", error });
+  }
+});
 
 
 const PORT = 5000;

@@ -13,8 +13,6 @@ function Login() {
 
     try {
       const response = await axios.post('http://localhost:5000/login', { username, password });
-      console.log('API Response:', response.data);
-
       if (response.data.success) {
         localStorage.setItem('username', response.data.username);
         localStorage.setItem('userId', response.data.userId);  // Save userId
@@ -23,7 +21,6 @@ function Login() {
         setError(response.data.message || 'Invalid username or password');
       }
     } catch (error) {
-      console.error('Login Error:', error);
       setError('An error occurred. Please try again.');
     }
   }
@@ -57,15 +54,13 @@ function Login() {
               required
             />
           </div>
-          <div className="mb-6">
-            <button
-              type="submit"
-              className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Login
-            </button>
-          </div>
-          {error && <div className="text-red-600 text-center">{error}</div>}
+          <button
+            type="submit"
+            className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Login
+          </button>
+          {error && <div className="text-red-600 text-center mt-4">{error}</div>}
         </form>
       </div>
     </div>
