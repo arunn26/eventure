@@ -34,7 +34,7 @@ function Profile() {
 
     try {
       const response = await axios.post('http://localhost:5000/changepassword', {
-        userId,          // Pass userId to the backend
+        userId,          
         currentPassword,
         newPassword,
       });
@@ -70,77 +70,73 @@ function Profile() {
   };
 
   return (
-    <div>
+    <div className="bg-gray-50 min-h-screen">
       <Header />
-      <div className="container mx-auto p-4">
-        <div className="text-center py-4">
-          <h1 className="text-2xl">Profile Management</h1>
-        </div>
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-8">Profile Management</h1>
 
-        <div className="bg-white p-4 mt-4 shadow-sm">
-          <h2 className="text-xl mb-4">Change Password</h2>
-          <form onSubmit={handlePasswordChange}>
-            <div className="mb-4">
-              <label htmlFor="currentPassword" className="block mb-2">Current Password</label>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-6">Change Password</h2>
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div>
+              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-600 mb-2">Current Password</label>
               <input
                 type="password"
                 id="currentPassword"
                 name="currentPassword"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="newPassword" className="block mb-2">New Password</label>
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-600 mb-2">New Password</label>
               <input
                 type="password"
                 id="newPassword"
                 name="newPassword"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="confirmPassword" className="block mb-2">Confirm New Password</label>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-600 mb-2">Confirm New Password</label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
-            <div className="mb-4">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-                disabled={!userId} // Disable button if userId is not available
-              >
-                Change Password
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={!userId} // Disable button if userId is not available
+            >
+              Change Password
+            </button>
           </form>
-          {message && <p className="text-red-500">{message}</p>}
+          {message && <p className="text-red-500 mt-4 text-center">{message}</p>}
         </div>
 
-        <div className="bg-white p-4 mt-4 shadow-sm">
-          <h2 className="text-xl mb-4">Past Events and Activities</h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-6">Past Events and Activities</h2>
           {pastEvents.length > 0 ? (
-            <ul className="list-disc pl-5">
-              {pastEvents.map((event, index) => (
-                <li key={event.eventid}>
-                  Event {index + 1}: {event.title} - Date: {formatDate(event.date)}
+            <ul className="list-disc pl-5 space-y-2">
+              {pastEvents.map((event) => (
+                <li key={event.eventid} className="text-gray-800">
+                  <span className="font-semibold">{event.title}</span> - Date: {formatDate(event.date)}
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No past events available</p>
+            <p className="text-gray-600">No past events available</p>
           )}
         </div>
       </div>

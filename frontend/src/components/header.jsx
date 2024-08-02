@@ -7,13 +7,20 @@ function Header() {
   };
 
   return (
-    <div>
-      <nav className="bg-gray-800 text-white p-4 text-center">
-        <Link to="/dashboard" className="mx-2">Home</Link>
-        <Link to="/events" className="mx-2">Events</Link>
-        <Link to="/tasks" className="mx-2">Tasks</Link>
-        <Link to="/profile" className="mx-2">Profile</Link>
-        <button onClick={handleLogout} className="mx-2">Logout</button>
+    <div className="bg-gray-900 text-white shadow-md">
+      <nav className="container mx-auto flex justify-between items-center p-4">
+        <div className="flex space-x-4">
+          <Link to="/dashboard" className="hover:bg-gray-700 px-3 py-2 rounded transition">Home</Link>
+          <Link to="/events" className="hover:bg-gray-700 px-3 py-2 rounded transition">Events</Link>
+          <Link to="/tasks" className="hover:bg-gray-700 px-3 py-2 rounded transition">Tasks</Link>
+          <Link to="/profile" className="hover:bg-gray-700 px-3 py-2 rounded transition">Profile</Link>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition"
+        >
+          Logout
+        </button>
       </nav>
     </div>
   );

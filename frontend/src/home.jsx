@@ -1,36 +1,41 @@
 import React from 'react';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+// import { FaCalendarPlus, FaSignInAlt } from 'react-icons/fa'; // Optional if you decide to use icons
 
-
-function Home() {
-    return (
-        <div className="bg-gray-100">
-            <div className="container mx-auto p-20">
-                <div className="bg-white p-8 rounded shadow-md mx-52">
-                    <h1 className="text-2xl font-bold mb-6">Eventure</h1>
-                    <div className="space-y-4">
-                        <div>
-                            <h2 className="text-lg font-semibold">Register Student Profile</h2>
-                            <p>Register as a student to access the student portal of Eventure</p>
-                            <Link to="/signup"><button className="mt-2 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700">Register your student profile</button>
-                            </Link>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold">Login to Student Portal</h2>
-                            <p>Please click the below link to login to the student portal</p>
-                            <Link to="/login"><button className="mt-2 py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700">Login to Student Portal</button>
-                            </Link>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold">Login to Admin Portal</h2>
-                            <p>Please click the below link to login to the admin portal</p>
-                            <button className="mt-2 py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700">Login to Admin Portal</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+const Home = () => {
+  return (
+    <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="container mx-auto p-6 max-w-md bg-white rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold mb-8 text-center text-blue-700">Welcome to Eventure</h1>
+        <p className="text-center text-gray-600 mb-8">
+          Your one-stop solution for managing and organizing events effortlessly. 
+          Sign up or log in to get started!
+        </p>
+        <div className="space-y-4">
+          <div className="bg-blue-50 p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-blue-600 mb-2">Signup</h2>
+            <p className="text-gray-700 mb-4">Create an account to start managing your events. It's quick and easy!</p>
+            <Link to="/signup">
+              <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                {/* <FaCalendarPlus className="inline-block mr-2" /> */}
+                Signup
+              </button>
+            </Link>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-green-600 mb-2">Login</h2>
+            <p className="text-gray-700 mb-4">Already have an account? Log in to access your events and more.</p>
+            <Link to="/login">
+              <button className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+                {/* <FaSignInAlt className="inline-block mr-2" /> */}
+                Login
+              </button>
+            </Link>
+          </div>
         </div>
-    );
-}
+      </div>
+    </div>
+  );
+};
 
 export default Home;

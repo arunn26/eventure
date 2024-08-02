@@ -33,50 +33,68 @@ function CreateEvent() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl mb-4">Create New Event</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2">Event Name</label>
-          <input
-            type="text"
-            name="title"
-            value={event.title}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Description</label>
-          <textarea
-            name="description"
-            value={event.description}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Date</label>
-          <input
-            type="date"
-            name="date"
-            value={event.date}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Location</label>
-          <input
-            type="text"
-            name="location"
-            value={event.location}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Create Event</button>
-      </form>
+    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-semibold text-gray-800 mb-6">Create New Event</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Event Name</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={event.title}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={event.description}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              rows="4"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={event.date}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={event.location}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Create Event
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

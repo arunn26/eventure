@@ -31,52 +31,55 @@ function Signup() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="text-center py-4">
-        <h1 className="text-2xl">Signup</h1>
-      </div>
-      <div className="bg-white p-4 mt-4 shadow-sm">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Sign Up</h1>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block mb-2">Username</label>
+          <div className="mb-6">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">Username</label>
             <input
               type="text"
               id="username"
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-2">Password</label>
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               type="password"
               id="password"
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block mb-2">Confirm Password</label>
+          <div className="mb-6">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"
               name="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="mb-4">
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Signup</button>
+          <div className="mb-6">
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Sign Up
+            </button>
           </div>
-          {error && <div className="text-red-600">{error}</div>}
+          {error && <div className="text-red-600 text-center">{error}</div>}
         </form>
       </div>
     </div>

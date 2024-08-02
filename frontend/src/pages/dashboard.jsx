@@ -6,6 +6,7 @@ import axios from 'axios';
 function Dashboard() {
   const [events, setEvents] = useState([]);
   const [username, setUsername] = useState('');
+  const [tasks, setTasks] = useState([]); // State for tasks
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -23,45 +24,73 @@ function Dashboard() {
       }
     };
 
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/tasks');
+        if (response.data.success) {
+          setTasks(response.data.tasks);
+        } else {
+          console.error('Failed to fetch tasks');
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
     // Fetch username from local storage
     const storedUsername = localStorage.getItem('username');
     setUsername(storedUsername || 'Guest');
 
     fetchEvents();    
+    fetchTasks();
   }, []);
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0]; // Get the date part only in yyyy-MM-dd format
-  };
 
   return (
     <div>
       <Header />
-      <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center py-4">
-          <h1 className="text-2xl">Welcome, {username}</h1>
-          <Link to="/createevent">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded">
-              Create New Event
-            </button>
-          </Link>
+      <div className="container mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-semibold">Welcome, {username}</h1>
+          <div className="flex space-x-4">
+            <Link to="/createevent">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition">
+                Create New Event
+              </button>
+            </Link>
+            <Link to="/createtask">
+              <button className="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition">
+                Create Task
+              </button>
+            </Link>
+          </div>
         </div>
-        <div className="bg-white p-4 mt-4 shadow-sm">
-          <h2 className="text-xl mb-4">Upcoming Events</h2>
+        <div className="bg-white p-6 mb-6 shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           {events.length > 0 ? (
             events.map((event, index) => (
-              <p key={event.eventid}>
-                Event {index + 1}: {event.title} - Date: {formatDate(event.date)}
-              </p>
+              <div key={event.eventid} className="border-b border-gray-300 py-2 last:border-b-0">
+                <p className="text-lg font-medium">
+                  Event {index + 1}: <span className="text-gray-700">{event.title}</span> - Date: <span className="text-gray-500">{new Date(event.date).toISOString().split('T')[0]}</span>
+                </p>
+              </div>
             ))
           ) : (
-            <p>No upcoming events available</p>
+            <p className="text-gray-500">No upcoming events available</p>
           )}
         </div>
-        <div className="bg-white p-4 mt-4 shadow-sm">
-          <h2 className="text-xl mb-4">Your Tasks</h2>
-          {}
+        <div className="bg-white p-6 shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4">Your Tasks</h2>
+          {tasks.length > 0 ? (
+            tasks.map((task, index) => (
+              <div key={task.taskid} className="bg-gray-100 p-4 mb-4 rounded-lg shadow-sm border border-gray-200">
+                <p className="text-lg font-medium">
+                  Task {index + 1}: <span className="text-gray-700">{task.title}</span>
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No tasks available</p>
+          )}
         </div>
       </div>
     </div>

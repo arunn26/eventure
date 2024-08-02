@@ -16,10 +16,8 @@ function Login() {
       console.log('API Response:', response.data);
 
       if (response.data.success) {
-        // Store the username, userId, and token in local storage
         localStorage.setItem('username', response.data.username);
         localStorage.setItem('userId', response.data.userId);  // Save userId
-        // Navigate to the dashboard
         navigate('/dashboard');
       } else {
         setError(response.data.message || 'Invalid username or password');
@@ -31,44 +29,43 @@ function Login() {
   }
 
   return (
-    <div className="container mx-auto p-20">
-      <div className="bg-white p-8 rounded shadow-md mx-52">
-        <h1 className="text-2xl font-bold mb-6">Login to Eventure</h1>
-
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Login to Eventure</h1>
         <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block mb-2 text-gray-700">Username</label>
+          <div className="mb-6">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">Username</label>
             <input
               type="text"
               id="username"
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-2 text-gray-700">Password</label>
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               type="password"
               id="password"
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-6">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Login
             </button>
           </div>
-          {error && <div className="text-red-600">{error}</div>}
+          {error && <div className="text-red-600 text-center">{error}</div>}
         </form>
       </div>
     </div>
