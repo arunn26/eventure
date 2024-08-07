@@ -25,24 +25,29 @@ function Profile() {
       setMessage('New passwords do not match');
       return;
     }
-
+  
     if (!userId) {
       setMessage('User ID is not available');
       return;
     }
-
+  
     try {
       const response = await axios.post('http://localhost:5000/changepassword', {
         userId,
         currentPassword,
         newPassword,
       });
-      setMessage(response.data.message);
+      if (response.data.success) {
+        setMessage('Password changed successfully');
+      } else {
+        setMessage(response.data.message || 'Failed to change password');
+      }
     } catch (error) {
-      console.error('Error changing password:', error);
+      // You can handle specific error cases here if needed
       setMessage('Error changing password');
     }
   };
+  
 
   useEffect(() => {
     const fetchEvents = async () => {
