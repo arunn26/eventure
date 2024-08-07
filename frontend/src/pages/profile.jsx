@@ -32,22 +32,20 @@ function Profile() {
     }
   
     try {
-      const response = await axios.post('http://localhost:5000/changepassword', {
+      const response = await axios.post('http://localhost:5000/auth/changepassword', {
         userId,
         currentPassword,
         newPassword,
       });
-      if (response.data.success) {
+      if (response.data.message === 'Password changed successfully') {
         setMessage('Password changed successfully');
       } else {
         setMessage(response.data.message || 'Failed to change password');
       }
     } catch (error) {
-      // You can handle specific error cases here if needed
       setMessage('Error changing password');
     }
   };
-  
 
   useEffect(() => {
     const fetchEvents = async () => {

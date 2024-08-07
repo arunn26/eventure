@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
-import Events from './pages/events';
-import Tasks from './pages/tasks';
+import Events from './events/events';
+import Tasks from './tasks/tasks';
 import Profile from './pages/profile';
-import Home from './home';
+import Home from './pages/home';
 import Login from './authentication/login';
 import Signup from './authentication/signup';
 import EditEvent from './events/editevent';
