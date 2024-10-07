@@ -53,40 +53,46 @@ function Events() {
         <div className="text-center py-6">
           <h1 className="text-3xl font-semibold text-gray-800">Event Details</h1>
         </div>
-        {events.map(event => (
-          <section key={event.eventid} className="bg-white p-6 mb-6 rounded-lg shadow-lg">
-            <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-700 mb-1">Event Name</h2>
-              <p className="text-gray-900">{event.title}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-700 mb-1">Event Date</h2>
-              <p className="text-gray-900">{formatDate(event.date)}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-700 mb-1">Location</h2>
-              <p className="text-gray-900">{event.location}</p>
-            </div>
-            <div className="mb-4">
-              <h2 className="text-xl font-bold text-gray-700 mb-1">Description</h2>
-              <p className="text-gray-900">{event.description}</p>
-            </div>
-            <div className="flex space-x-4">
-              <button 
-                onClick={() => handleEdit(event.eventid)}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
-              >
-                Edit Event
-              </button>
-              <button 
-                onClick={() => handleDelete(event.eventid)}
-                className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition"
-              >
-                Delete Event
-              </button>
-            </div>
-          </section>
-        ))}
+        {events.length > 0 ? (
+          events.map(event => (
+            <section key={event.eventid} className="bg-white p-6 mb-6 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-700 mb-1">Event Name</h2>
+                <p className="text-gray-900">{event.title}</p>
+              </div>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-700 mb-1">Event Date</h2>
+                <p className="text-gray-900">{formatDate(event.date)}</p>
+              </div>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-700 mb-1">Location</h2>
+                <p className="text-gray-900">{event.location}</p>
+              </div>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-700 mb-1">Description</h2>
+                <p className="text-gray-900">{event.description}</p>
+              </div>
+              <div className="flex space-x-4">
+                <button 
+                  onClick={() => handleEdit(event.eventid)}
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
+                >
+                  Edit Event
+                </button>
+                <button 
+                  onClick={() => handleDelete(event.eventid)}
+                  className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition"
+                >
+                  Delete Event
+                </button>
+              </div>
+            </section>
+          ))
+        ) : (
+          <div className="bg-white p-6 mb-6 rounded-lg shadow-lg">
+            <p className="text-gray-700">No events found</p>
+          </div>
+        )}
       </main>
     </div>
   );
